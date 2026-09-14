@@ -1,1 +1,474 @@
 
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koncerty — mapa województw</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:#121014;
+  --bg-alt:#1a1620;
+  --panel:#1c1820;
+  --paper:#efe7d8;
+  --gold:#c9a13b;
+  --gold-dim:#8a7130;
+  --moss:#6f9463;
+  --moss-dim:#4d6b45;
+  --ink:#ede6d9;
+  --muted:#948c80;
+  --line: rgba(237,230,217,0.12);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,161,59,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 10%, rgba(111,148,99,0.08), transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Inter', sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding: 56px 24px 80px;
+}
+
+header.hero{
+  margin-bottom:56px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:32px;
+}
+
+.hero-title{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:clamp(52px, 9vw, 96px);
+  line-height:0.92;
+  letter-spacing:0.5px;
+  margin:0;
+  color:var(--paper);
+}
+.hero-title span{ color:var(--gold); }
+
+.hero-sub{
+  font-size:16px;
+  color:var(--muted);
+  max-width:480px;
+  line-height:1.5;
+  margin:0;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns: 460px 1fr;
+  gap:48px;
+  align-items:start;
+}
+
+@media (max-width: 900px){
+  .layout{ grid-template-columns: 1fr; }
+}
+
+/* ---------- MAP ---------- */
+
+.map-card{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:36px 20px 28px;
+  position:sticky;
+  top:24px;
+}
+
+@media (max-width:900px){ .map-card{ position:static; } }
+
+.map-label{
+  font-size:12px;
+  letter-spacing:0.08em;
+  color:var(--muted);
+  margin:0 0 22px 4px;
+}
+
+.hexgrid{ display:flex; flex-direction:column; gap:9px; align-items:center; }
+.hexrow{ display:flex; gap:9px; }
+.hexrow.offset{ margin-left:57px; }
+
+.hex{
+  --w:104px; --h:90px;
+  width:var(--w); height:var(--h);
+  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0% 50%);
+  border:none;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:4px 8px;
+  font-family:'Inter', sans-serif;
+  background: #26202c;
+  color:var(--muted);
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+  position:relative;
+}
+.hex:hover{ background:#312a39; color:var(--ink); transform:translateY(-2px); }
+
+.hex.has-data{ background:#2c2416; color:#d8cdb8; }
+.hex.has-data:hover{ background:#3a2f1a; color:var(--paper); }
+
+.hex.active{ background:var(--gold); color:#1a1610; }
+.hex.active .hex-dot{ background:#1a1610; }
+.hex.active:hover{ background:var(--gold); transform:none; }
+
+.hex-name{
+  font-size:11px;
+  font-weight:600;
+  line-height:1.15;
+  letter-spacing:0.01em;
+}
+
+.hex-dot{
+  width:5px; height:5px; border-radius:50%;
+  background:var(--gold);
+  margin-top:5px;
+}
+
+.map-legend{
+  display:flex;
+  gap:18px;
+  justify-content:center;
+  margin-top:26px;
+  font-size:12px;
+  color:var(--muted);
+}
+.map-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.legend-swatch{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+/* ---------- PANEL ---------- */
+
+.panel{ min-height:420px; }
+
+.panel-empty{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:60px 8px;
+  color:var(--muted);
+  gap:8px;
+}
+.panel-empty .big{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:34px;
+  color:var(--paper);
+  letter-spacing:0.5px;
+}
+
+.region-head{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:6px;
+}
+.region-head h2{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:44px;
+  letter-spacing:0.5px;
+  margin:0;
+  color:var(--paper);
+}
+.region-count{ font-size:13px; color:var(--muted); }
+
+.region-empty-msg{
+  margin-top:24px;
+  color:var(--muted);
+  font-size:14.5px;
+  line-height:1.6;
+  border-left:2px solid var(--line);
+  padding-left:16px;
+}
+
+section.group{ margin-top:38px; }
+
+.group-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+.group-title h3{
+  font-size:13px;
+  letter-spacing:0.09em;
+  text-transform:uppercase;
+  margin:0;
+  color:var(--ink);
+  font-weight:600;
+}
+.group-title .rule{ flex:1; height:1px; background:var(--line); }
+.group-title.paid .dot{ background:var(--gold); }
+.group-title.free .dot{ background:var(--moss); }
+.group-title .dot{ width:7px;height:7px;border-radius:50%; }
+
+.cards{ display:flex; flex-direction:column; gap:12px; }
+
+.ticket{
+  position:relative;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:3px solid var(--gold-dim);
+  border-radius:4px;
+  padding:18px 46px 18px 20px;
+  overflow:hidden;
+}
+.ticket.free{ border-left-color:var(--moss-dim); }
+
+.ticket::after{
+  content:"";
+  position:absolute;
+  right:20px; top:0; bottom:0;
+  width:0;
+  border-right:1px dashed rgba(237,230,217,0.16);
+}
+
+.ticket-band{
+  font-size:19px;
+  font-weight:700;
+  color:var(--paper);
+  margin:0 0 6px;
+}
+
+.ticket-meta{
+  font-size:14px;
+  color:var(--ink);
+  margin:0 0 3px;
+}
+.ticket-meta .city{ color:var(--ink); }
+.ticket-meta .venue{ color:var(--muted); }
+
+.ticket-date{
+  font-size:13px;
+  color:var(--gold);
+  font-weight:600;
+  margin:0 0 6px;
+}
+.ticket.free .ticket-date{ color:var(--moss); }
+
+.ticket-tour{
+  font-size:13px;
+  color:var(--muted);
+  font-style:italic;
+  margin:0;
+}
+
+.ticket-note{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid var(--line);
+}
+
+.empty-line{
+  font-size:14px;
+  color:var(--muted);
+  padding:14px 0;
+}
+
+footer{
+  margin-top:64px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1 class="hero-title">Koncerty<span>.</span></h1>
+    <p class="hero-sub">Wybierz województwo na mapie i sprawdź, kto gra w Twojej okolicy — podzielone na koncerty płatne i darmowe.</p>
+  </header>
+
+  <div class="layout">
+    <div class="map-card">
+      <p class="map-label">Mapa województw</p>
+      <div class="hexgrid" id="hexgrid"></div>
+      <div class="map-legend">
+        <span><span class="legend-swatch" style="background:#2c2416;"></span>zapowiedziane koncerty</span>
+        <span><span class="legend-swatch" style="background:#26202c;"></span>brak zapowiedzi</span>
+      </div>
+    </div>
+
+    <div class="panel" id="panel">
+      <div class="panel-empty">
+        <div class="big">Wybierz województwo</div>
+        <div>Kliknij dowolny sześciokąt na mapie, aby zobaczyć listę koncertów.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Dane koncertowe aktualizowane ręcznie · wybrane zespoły polskiej sceny rockowej i alternatywnej.</footer>
+</div>
+
+<script>
+const REGIONS = [
+  { key:'zachodniopomorskie', name:'Zachodnio­pomorskie' },
+  { key:'pomorskie', name:'Pomorskie' },
+  { key:'warminsko-mazurskie', name:'Warmińsko-Mazurskie' },
+  { key:'podlaskie', name:'Podlaskie' },
+  { key:'lubuskie', name:'Lubuskie' },
+  { key:'wielkopolskie', name:'Wielkopolskie' },
+  { key:'kujawsko-pomorskie', name:'Kujawsko-Pomorskie' },
+  { key:'mazowieckie', name:'Mazowieckie' },
+  { key:'lubelskie', name:'Lubelskie' },
+  { key:'dolnoslaskie', name:'Dolnośląskie' },
+  { key:'lodzkie', name:'Łódzkie' },
+  { key:'swietokrzyskie', name:'Świętokrzyskie' },
+  { key:'opolskie', name:'Opolskie' },
+  { key:'slaskie', name:'Śląskie' },
+  { key:'malopolskie', name:'Małopolskie' },
+  { key:'podkarpackie', name:'Podkarpackie' },
+];
+
+const ROWS = [
+  ['zachodniopomorskie','pomorskie','warminsko-mazurskie','podlaskie'],
+  ['lubuskie','wielkopolskie','kujawsko-pomorskie','mazowieckie','lubelskie'],
+  ['dolnoslaskie','lodzkie','swietokrzyskie'],
+  ['opolskie','slaskie','malopolskie','podkarpackie'],
+];
+const ROW_OFFSET = [false, true, false, true];
+
+const DATA = {
+  swietokrzyskie: {
+    paid: [
+      { band:'Kult', city:'Kielce', venue:'Amfiteatr Kadzielnia', date:'26 września 2026', tour:'PGS Rock Festival IV Edycja' },
+      { band:'Pull the Wire', city:'Skarżysko-Kamienna', venue:'Klub SEMAFOR', date:'10 października 2026', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Kielce', venue:'Studencki Klub WSPAK', date:'28 listopada 2026', tour:'Trasa 2026' },
+    ],
+    free: [],
+  },
+  malopolskie: {
+    paid: [
+      { band:'Strachy na Lachy', city:'Kraków', venue:'Klub Kwadrat', date:'17 października 2026', tour:'Koncert klubowy' },
+      { band:'Koniec Świata', city:'Kraków', venue:'Klub Zaścianek', date:'23 października 2026', tour:'Trasa 2026' },
+      { band:'Koniec Świata', city:'Tarnów', venue:'Piwnica „Przepraszam”', date:'6 listopada 2026', tour:'Trasa 2026' },
+      { band:'Myslovitz', city:'Kraków', venue:'Klub STUDIO', date:'27 listopada 2026', tour:'Trasa „DLA CIEBIE wpadłem w głęboką depresję OSTATNI RAZ” / Korova Milky Bar' },
+    ],
+    free: [],
+  },
+  slaskie: {
+    paid: [
+      { band:'Pull the Wire', city:'Rybnik', venue:'Klub Odyseja', date:'9 października 2026', tour:'Trasa koncertowa 2026' },
+      { band:'Strachy na Lachy', city:'Zabrze', venue:'Klub CK Wiatrak', date:'13 listopada 2026', tour:'Koncert klubowy' },
+      { band:'Koniec Świata', city:'Częstochowa', venue:'Klub Muzyczna Meta', date:'13 listopada 2026', tour:'Trasa 2026' },
+      { band:'Kult', city:'Katowice', venue:'Hala Spodek', date:'14 listopada 2026', tour:'Trasa Pomarańczowa 2026' },
+      { band:'Myslovitz', city:'Katowice', venue:'Hala Spodek', date:'15 listopada 2026', tour:'Korova Milky Bar 2026' },
+      { band:'Koniec Świata', city:'Bielsko-Biała', venue:'Rudeboy Club', date:'21 listopada 2026', tour:'Trasa 2026' },
+      { band:'Koniec Świata', city:'Sosnowiec', venue:'Komin Music Cafe', date:'27 listopada 2026', tour:'Trasa 2026' },
+      { band:'Koniec Świata', city:'Gliwice', venue:'Klub Studencki „Spirala”', date:'5 grudnia 2026', tour:'Trasa 2026' },
+    ],
+    free: [
+      { band:'Kult', city:'Tychy', venue:'Miejski Park Solidarności', date:'26–28 czerwca 2026', tour:'Święto Miasta Tychy (Obchody 75-lecia Tychów)', note:'Wydarzenie plenerowe z zeszłorocznej edycji obchodów — sprawdź aktualność terminu przed wyjazdem.' },
+    ],
+  },
+};
+
+const hexgrid = document.getElementById('hexgrid');
+const panel = document.getElementById('panel');
+let activeKey = null;
+
+function regionName(key){
+  return REGIONS.find(r => r.key === key).name;
+}
+
+ROWS.forEach((row, i) => {
+  const rowEl = document.createElement('div');
+  rowEl.className = 'hexrow' + (ROW_OFFSET[i] ? ' offset' : '');
+  row.forEach(key => {
+    const info = REGIONS.find(r => r.key === key);
+    const d = DATA[key];
+    const hasData = d && (d.paid.length || d.free.length);
+
+    const btn = document.createElement('button');
+    btn.className = 'hex' + (hasData ? ' has-data' : '');
+    btn.dataset.key = key;
+    btn.innerHTML = `<span class="hex-name">${info.name}</span>` + (hasData ? '<span class="hex-dot"></span>' : '');
+    btn.addEventListener('click', () => selectRegion(key));
+    rowEl.appendChild(btn);
+  });
+  hexgrid.appendChild(rowEl);
+});
+
+function ticketCard(item, type){
+  const noteHtml = item.note ? `<div class="ticket-note">${item.note}</div>` : '';
+  return `
+    <div class="ticket ${type}">
+      <p class="ticket-band">${item.band}</p>
+      <p class="ticket-meta"><span class="city">${item.city}</span> — <span class="venue">${item.venue}</span></p>
+      <p class="ticket-date">${item.date}</p>
+      <p class="ticket-tour">${item.tour}</p>
+      ${noteHtml}
+    </div>`;
+}
+
+function selectRegion(key){
+  activeKey = key;
+  document.querySelectorAll('.hex').forEach(h => h.classList.toggle('active', h.dataset.key === key));
+
+  const name = regionName(key);
+  const d = DATA[key] || { paid: [], free: [] };
+  const total = d.paid.length + d.free.length;
+
+  if(total === 0){
+    panel.innerHTML = `
+      <div class="region-head">
+        <h2>${name}</h2>
+        <span class="region-count">0 koncertów</span>
+      </div>
+      <div class="region-empty-msg">Brak ogłoszonych koncertów wybranych zespołów w tym regionie. Zajrzyj tu ponownie wkrótce — lista jest aktualizowana na bieżąco.</div>
+    `;
+    return;
+  }
+
+  const paidHtml = d.paid.length
+    ? `<div class="cards">${d.paid.map(i => ticketCard(i, 'paid')).join('')}</div>`
+    : `<div class="empty-line">Brak ogłoszonych płatnych koncertów wybranych zespołów w tym regionie.</div>`;
+
+  const freeHtml = d.free.length
+    ? `<div class="cards">${d.free.map(i => ticketCard(i, 'free')).join('')}</div>`
+    : `<div class="empty-line">Brak ogłoszonych bezpłatnych koncertów wybranych zespołów w tym regionie.</div>`;
+
+  panel.innerHTML = `
+    <div class="region-head">
+      <h2>${name}</h2>
+      <span class="region-count">${total} ${total === 1 ? 'koncert' : 'koncertów'}</span>
+    </div>
+
+    <section class="group">
+      <div class="group-title paid"><span class="dot"></span><h3>Płatne</h3><span class="rule"></span></div>
+      ${paidHtml}
+    </section>
+
+    <section class="group">
+      <div class="group-title free"><span class="dot"></span><h3>Darmowe</h3><span class="rule"></span></div>
+      ${freeHtml}
+    </section>
+  `;
+}
+</script>
+</body>
+</html>
