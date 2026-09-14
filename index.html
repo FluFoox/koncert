@@ -113,6 +113,7 @@ header.hero{
 .map-toggle-btn.active .cal-icon::after{ background:#1a1610; }
 .map-toggle-btn.active .search-icon{ border-color:#1a1610; }
 .map-toggle-btn.active .search-icon::after{ background:#1a1610; }
+.map-toggle-btn.active .fav-icon{ background:#1a1610; }
 
 .map-toggle-btn .search-icon{
   position:relative;
@@ -128,6 +129,13 @@ header.hero{
   background:var(--gold);
   transform:rotate(45deg);
   right:-5.5px; bottom:-1.5px;
+}
+
+.map-toggle-btn .fav-icon{
+  width:15px; height:15px;
+  background:var(--gold);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  flex-shrink:0;
 }
 
 .map-toggle-btn .cal-icon{
@@ -450,6 +458,37 @@ section.group{ margin-top:38px; }
   color:var(--muted);
 }
 
+.ticket-date-group{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink:0;
+}
+
+.ticket-star{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:22px; height:22px;
+  padding:0;
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  flex-shrink:0;
+  transition: color .15s ease, transform .12s ease;
+}
+.ticket-star:hover{ color:var(--gold); transform:scale(1.1); }
+.ticket-star.active{ color:var(--gold); }
+.ticket-star svg{
+  width:19px; height:19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+  stroke-linejoin:round;
+}
+.ticket-star.active svg{ fill:currentColor; }
+
 .ticket-note{
   font-size:11.5px;
   color:var(--muted);
@@ -463,7 +502,7 @@ section.group{ margin-top:38px; }
   .ticket-info{ order:3; width:100%; justify-content:flex-start; white-space:normal; }
   .ticket-info .tour, .ticket-info .venue{ white-space:normal; }
   .ticket-divider{ display:none; }
-  .ticket-stub{ margin-left:auto; }
+  .ticket-date-group{ margin-left:auto; }
 }
 
 
@@ -718,6 +757,7 @@ footer{
     <button id="mapToggle" class="map-toggle-btn"><span class="hex-icon"></span>Mapa</button>
     <button id="eventsToggle" class="map-toggle-btn"><span class="cal-icon"></span>Wydarzenia</button>
     <button id="bandSearchToggle" class="map-toggle-btn"><span class="search-icon"></span>Wyszukiwarka zespołów</button>
+    <button id="favToggle" class="map-toggle-btn"><span class="fav-icon"></span>Ulubione</button>
     <p class="toolbar-hint" id="toolbarHint">Kliknij dzień w kalendarzu, aby zobaczyć koncerty zaplanowane na ten termin.</p>
   </div>
 
@@ -792,6 +832,18 @@ footer{
       <input type="text" id="searchInput" class="search-input" placeholder="Wpisz nazwę zespołu, np. Dżem, Kult, Hunter…" autocomplete="off">
       <div class="cards" id="searchResults" style="margin-top:22px;">
         <div class="empty-line">Wpisz nazwę zespołu, aby zobaczyć nadchodzące koncerty.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="favoritesView" style="display:none;">
+    <div class="search-card">
+      <div class="search-head">
+        <p class="events-label" style="margin:0;">Ulubione wydarzenia</p>
+        <span class="search-count" id="favCount"></span>
+      </div>
+      <div class="cards" id="favResults">
+        <div class="empty-line">Nie masz jeszcze żadnych ulubionych wydarzeń. Kliknij gwiazdkę przy koncercie, aby dodać go tutaj.</div>
       </div>
     </div>
   </div>
@@ -1066,6 +1118,55 @@ REGIONS.forEach(info => {
 });
 ALL_ITEMS.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
+/* ---------- favorites (ulubione) ---------- */
+
+let favorites = new Set();
+const hasPersistentStorage = typeof window.storage !== 'undefined';
+
+async function loadFavorites(){
+  if(!hasPersistentStorage) return;
+  try{
+    const res = await window.storage.get('favorites', false);
+    if(res && res.value){
+      favorites = new Set(JSON.parse(res.value));
+    }
+  }catch(e){ /* no saved favorites yet */ }
+  refreshStarButtons();
+  if(currentView === 'favorites') renderFavoritesView();
+}
+
+function persistFavorites(){
+  if(!hasPersistentStorage) return;
+  window.storage.set('favorites', JSON.stringify([...favorites]), false).catch(() => {});
+}
+
+function refreshStarButtons(){
+  document.querySelectorAll('.ticket-star').forEach(btn => {
+    btn.classList.toggle('active', favorites.has(btn.dataset.favId));
+  });
+}
+
+function toggleFavorite(id){
+  if(favorites.has(id)) favorites.delete(id);
+  else favorites.add(id);
+  persistFavorites();
+  refreshStarButtons();
+  updateFavCount();
+  if(currentView === 'favorites') renderFavoritesView();
+}
+
+function updateFavCount(){
+  const badge = document.getElementById('favCount');
+  if(badge) badge.textContent = favorites.size ? `${favorites.size} ${favorites.size === 1 ? 'wydarzenie' : 'wydarzeń'}` : '';
+}
+
+document.addEventListener('click', (e) => {
+  const starBtn = e.target.closest('.ticket-star');
+  if(!starBtn) return;
+  e.stopPropagation();
+  toggleFavorite(starBtn.dataset.favId);
+});
+
 const hexgrid = document.getElementById('hexgrid');
 const panel = document.getElementById('panel');
 let activeKey = null;
@@ -1098,11 +1199,18 @@ hexgrid.style.width = maxX + 'px';
 hexgrid.style.height = maxY + 'px';
 
 const TICKET_MONTHS = ['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
+const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.95 6.29 6.8.86-5.02 4.75 1.36 6.85L12 17.9l-6.09 3.35 1.36-6.85-5.02-4.75 6.8-.86L12 2.5z"/></svg>';
+
+function favId(item){
+  return `${item.band}__${item.sortDate}__${item.city}`;
+}
 
 function ticketCard(item, type, showRegion){
   const noteHtml = item.note ? `<div class="ticket-note">${item.note}</div>` : '';
   const regionHtml = showRegion ? `<span class="region-tag">${item.regionName}</span>` : '';
   const [y, m, d] = item.sortDate.split('-').map(Number);
+  const id = favId(item);
+  const isFav = favorites.has(id);
 
   return `
     <div class="ticket ${type}">
@@ -1120,12 +1228,15 @@ function ticketCard(item, type, showRegion){
           <span class="venue">${item.venue}</span>
         </div>
         <div class="ticket-divider"></div>
-        <div class="ticket-stub">
-          <span class="stub-day">${d}</span>
-          <div class="stub-monthyear">
-            <span class="stub-month">${TICKET_MONTHS[m - 1]}</span>
-            <span class="stub-year">${y}</span>
+        <div class="ticket-date-group">
+          <div class="ticket-stub">
+            <span class="stub-day">${d}</span>
+            <div class="stub-monthyear">
+              <span class="stub-month">${TICKET_MONTHS[m - 1]}</span>
+              <span class="stub-year">${y}</span>
+            </div>
           </div>
+          <button type="button" class="ticket-star${isFav ? ' active' : ''}" data-fav-id="${id}" aria-label="Dodaj do ulubionych" title="Dodaj do ulubionych">${STAR_SVG}</button>
         </div>
       </div>
       ${noteHtml}
@@ -1289,15 +1400,29 @@ function renderSearchResults(){
 
 searchInput.addEventListener('input', renderSearchResults);
 
+/* ---------- favorites view (ulubione) ---------- */
+
+const favResults = document.getElementById('favResults');
+
+function renderFavoritesView(){
+  const items = ALL_ITEMS.filter(i => favorites.has(favId(i)));
+  updateFavCount();
+  favResults.innerHTML = items.length
+    ? `<div class="cards">${items.map(i => ticketCard(i, i.type, true)).join('')}</div>`
+    : `<div class="empty-line">Nie masz jeszcze żadnych ulubionych wydarzeń. Kliknij gwiazdkę przy koncercie, aby dodać go tutaj.</div>`;
+}
+
 /* ---------- view switching (lista / mapa / wydarzenia / wyszukiwarka) ---------- */
 
 const mapToggle = document.getElementById('mapToggle');
 const eventsToggle = document.getElementById('eventsToggle');
 const bandSearchToggle = document.getElementById('bandSearchToggle');
+const favToggle = document.getElementById('favToggle');
 const listView = document.getElementById('listView');
 const mapView = document.getElementById('mapView');
 const eventsView = document.getElementById('eventsView');
 const searchView = document.getElementById('searchView');
+const favoritesView = document.getElementById('favoritesView');
 const toolbarHint = document.getElementById('toolbarHint');
 
 const HINTS = {
@@ -1305,6 +1430,7 @@ const HINTS = {
   map: 'Kliknij dowolny sześciokąt, aby zawęzić listę do jednego województwa.',
   events: 'Największe festiwale i cykliczne wydarzenia — daty ostatnich i nadchodzących edycji.',
   search: 'Wpisz nazwę zespołu, aby zobaczyć wszystkie jego zapowiedziane koncerty.',
+  favorites: 'Twoje zapisane koncerty — kliknij gwiazdkę przy bilecie, aby dodać go do listy.',
 };
 
 let currentView = 'list';
@@ -1316,21 +1442,30 @@ function setView(view){
   mapView.style.display = currentView === 'map' ? 'grid' : 'none';
   eventsView.style.display = currentView === 'events' ? 'block' : 'none';
   searchView.style.display = currentView === 'search' ? 'block' : 'none';
+  favoritesView.style.display = currentView === 'favorites' ? 'block' : 'none';
 
   mapToggle.classList.toggle('active', currentView === 'map');
   eventsToggle.classList.toggle('active', currentView === 'events');
   bandSearchToggle.classList.toggle('active', currentView === 'search');
+  favToggle.classList.toggle('active', currentView === 'favorites');
 
   toolbarHint.textContent = HINTS[currentView];
 
   if(currentView === 'search'){
     searchInput.focus();
   }
+  if(currentView === 'favorites'){
+    renderFavoritesView();
+  }
 }
 
 mapToggle.addEventListener('click', () => setView('map'));
 eventsToggle.addEventListener('click', () => setView('events'));
 bandSearchToggle.addEventListener('click', () => setView('search'));
+favToggle.addEventListener('click', () => setView('favorites'));
+
+loadFavorites();
+
 </script>
 </body>
 </html>
