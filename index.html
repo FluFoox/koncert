@@ -68,9 +68,123 @@ header.hero{
   margin:0;
 }
 
+/* ---------- TOOLBAR / MAP TOGGLE ---------- */
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+  margin-bottom:32px;
+}
+
+.map-toggle-btn{
+  font-family:'Inter', sans-serif;
+  font-size:15.5px;
+  font-weight:600;
+  letter-spacing:0.03em;
+  color:var(--ink);
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:16px 30px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+  flex-shrink:0;
+}
+.map-toggle-btn:hover{ border-color: var(--gold-dim); color:var(--paper); }
+.map-toggle-btn .hex-icon{
+  width:15px; height:15px;
+  background:var(--gold);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  flex-shrink:0;
+}
+.map-toggle-btn.active{
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#1a1610;
+}
+.map-toggle-btn.active .hex-icon{ background:#1a1610; }
+.map-toggle-btn.active .cal-icon{ border-color:#1a1610; }
+.map-toggle-btn.active .cal-icon::before,
+.map-toggle-btn.active .cal-icon::after{ background:#1a1610; }
+.map-toggle-btn.active .search-icon{ border-color:#1a1610; }
+.map-toggle-btn.active .search-icon::after{ background:#1a1610; }
+
+.map-toggle-btn .search-icon{
+  position:relative;
+  width:13px; height:13px;
+  border:1.6px solid var(--gold);
+  border-radius:50%;
+  flex-shrink:0;
+}
+.map-toggle-btn .search-icon::after{
+  content:"";
+  position:absolute;
+  width:6px; height:1.6px;
+  background:var(--gold);
+  transform:rotate(45deg);
+  right:-5.5px; bottom:-1.5px;
+}
+
+.map-toggle-btn .cal-icon{
+  position:relative;
+  width:15px; height:14px;
+  border:1.6px solid var(--gold);
+  border-radius:2px;
+  flex-shrink:0;
+}
+.map-toggle-btn .cal-icon::before{
+  content:"";
+  position:absolute;
+  left:3px; right:3px; top:4px;
+  height:1.4px;
+  background:var(--gold);
+}
+.map-toggle-btn .cal-icon::after{
+  content:"";
+  position:absolute;
+  top:-4px; left:3px;
+  width:1.6px; height:5px;
+  background:var(--gold);
+  box-shadow: 6px 0 0 var(--gold);
+}
+
+.toolbar-hint{
+  font-size:13.5px;
+  color:var(--muted);
+}
+
+/* ---------- SPLIT (darmowe | płatne) ---------- */
+
+.split{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:40px;
+}
+@media (max-width: 720px){
+  .split{ grid-template-columns: 1fr; gap:36px; }
+}
+
+.split-col .group-title{ margin-bottom:18px; }
+
+.region-tag{
+  display:inline-block;
+  font-size:11px;
+  color:var(--muted);
+  background:rgba(237,230,217,0.06);
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:2px 7px;
+  margin-bottom:8px;
+}
+
 .layout{
   display:grid;
-  grid-template-columns: 460px 1fr;
+  grid-template-columns: 480px 1fr;
   gap:48px;
   align-items:start;
 }
@@ -99,14 +213,13 @@ header.hero{
   margin:0 0 22px 4px;
 }
 
-.hexgrid{ display:flex; flex-direction:column; gap:9px; align-items:center; }
-.hexrow{ display:flex; gap:9px; }
-.hexrow.offset{ margin-left:57px; }
+.hexgrid{ position:relative; margin:0 auto; }
 
 .hex{
-  --w:104px; --h:90px;
+  --w:78px; --h:90px;
   width:var(--w); height:var(--h);
-  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0% 50%);
+  position:absolute; top:0; left:0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   border:none;
   cursor:pointer;
   display:flex;
@@ -114,31 +227,38 @@ header.hero{
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:4px 8px;
+  padding:0 10px;
   font-family:'Inter', sans-serif;
   background: #26202c;
   color:var(--muted);
-  transition: background .18s ease, color .18s ease, transform .18s ease;
-  position:relative;
+  transition: background .18s ease, color .18s ease, filter .18s ease;
+  outline-offset: -2px;
 }
-.hex:hover{ background:#312a39; color:var(--ink); transform:translateY(-2px); }
+.hex::after{
+  content:"";
+  position:absolute; inset:1px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border:1px solid var(--bg);
+  pointer-events:none;
+}
+.hex:hover{ background:#332b3c; color:var(--ink); }
 
 .hex.has-data{ background:#2c2416; color:#d8cdb8; }
-.hex.has-data:hover{ background:#3a2f1a; color:var(--paper); }
+.hex.has-data:hover{ background:#3d311c; color:var(--paper); }
 
 .hex.active{ background:var(--gold); color:#1a1610; }
 .hex.active .hex-dot{ background:#1a1610; }
-.hex.active:hover{ background:var(--gold); transform:none; }
+.hex.active:hover{ background:var(--gold); }
 
 .hex-name{
-  font-size:11px;
+  font-size:9.5px;
   font-weight:600;
-  line-height:1.15;
+  line-height:1.18;
   letter-spacing:0.01em;
 }
 
 .hex-dot{
-  width:5px; height:5px; border-radius:50%;
+  width:4px; height:4px; border-radius:50%;
   background:var(--gold);
   margin-top:5px;
 }
@@ -285,6 +405,100 @@ section.group{ margin-top:38px; }
   padding:14px 0;
 }
 
+/* ---------- EVENTS (festiwale) ---------- */
+
+.events-card{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:28px 28px 12px;
+  overflow-x:auto;
+}
+
+.events-label{
+  font-size:12px;
+  letter-spacing:0.08em;
+  color:var(--muted);
+  margin:0 0 20px 2px;
+  text-transform:uppercase;
+}
+
+.events-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:820px;
+}
+
+.events-table th{
+  text-align:left;
+  font-size:11.5px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:600;
+  padding:0 14px 12px;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+
+.events-table td{
+  padding:16px 14px;
+  border-bottom:1px solid var(--line);
+  font-size:14px;
+  color:var(--ink);
+  vertical-align:top;
+  line-height:1.5;
+}
+
+.events-table tr:last-child td{ border-bottom:none; }
+.events-table tr:hover td{ background:rgba(237,230,217,0.03); }
+
+.ev-lp{ color:var(--muted); font-size:13px; width:34px; }
+.ev-name{ font-weight:700; color:var(--paper); font-size:15px; }
+.ev-place{ color:var(--muted); font-size:13px; max-width:220px; }
+.ev-past{ color:var(--ink); font-size:13px; }
+.ev-next{ color:var(--gold); font-weight:600; font-size:13px; }
+.ev-line{ display:block; }
+.ev-line + .ev-line{ margin-top:4px; }
+.ev-line .ev-tag{ color:var(--muted); font-weight:500; }
+
+/* ---------- SEARCH (wyszukiwarka zespołów) ---------- */
+
+.search-card{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:28px 28px 32px;
+}
+
+.search-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.search-count{
+  font-size:12.5px;
+  color:var(--muted);
+}
+
+.search-input{
+  width:100%;
+  font-family:'Inter', sans-serif;
+  font-size:16px;
+  color:var(--ink);
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:14px 16px;
+  outline:none;
+  transition: border-color .16s ease;
+}
+.search-input::placeholder{ color:var(--muted); }
+.search-input:focus{ border-color:var(--gold-dim); }
+
 footer{
   margin-top:64px;
   padding-top:20px;
@@ -299,10 +513,28 @@ footer{
 
   <header class="hero">
     <h1 class="hero-title">Koncerty<span>.</span></h1>
-    <p class="hero-sub">Wybierz województwo na mapie i sprawdź, kto gra w Twojej okolicy — podzielone na koncerty płatne i darmowe.</p>
+    <p class="hero-sub">Wszystkie zapowiedziane koncerty, od najbliższego — podzielone na darmowe i płatne. Włącz mapę, żeby zawęzić listę do jednego województwa.</p>
   </header>
 
-  <div class="layout">
+  <div class="toolbar">
+    <button id="mapToggle" class="map-toggle-btn"><span class="hex-icon"></span>Mapa</button>
+    <button id="eventsToggle" class="map-toggle-btn"><span class="cal-icon"></span>Wydarzenia</button>
+    <button id="bandSearchToggle" class="map-toggle-btn"><span class="search-icon"></span>Wyszukiwarka zespołów</button>
+    <p class="toolbar-hint" id="toolbarHint">Kliknij, aby wybrać województwo na mapie.</p>
+  </div>
+
+  <div id="listView" class="split">
+    <div class="split-col">
+      <div class="group-title free"><span class="dot"></span><h3>Darmowe</h3><span class="rule"></span></div>
+      <div class="cards" id="freeAllCards"></div>
+    </div>
+    <div class="split-col">
+      <div class="group-title paid"><span class="dot"></span><h3>Płatne</h3><span class="rule"></span></div>
+      <div class="cards" id="paidAllCards"></div>
+    </div>
+  </div>
+
+  <div id="mapView" class="layout" style="display:none;">
     <div class="map-card">
       <p class="map-label">Mapa województw</p>
       <div class="hexgrid" id="hexgrid"></div>
@@ -320,71 +552,306 @@ footer{
     </div>
   </div>
 
+  <div id="eventsView" style="display:none;">
+    <div class="events-card">
+      <p class="events-label">Festiwale i duże wydarzenia</p>
+      <table class="events-table">
+        <thead>
+          <tr>
+            <th>Lp.</th>
+            <th>Festiwal / Wydarzenie</th>
+            <th>Miejsce</th>
+            <th>Daty odbytych edycji</th>
+            <th>Daty planowanych / kolejnych edycji</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="searchView" style="display:none;">
+    <div class="search-card">
+      <div class="search-head">
+        <p class="events-label" style="margin:0;">Wyszukiwarka zespołów</p>
+        <span class="search-count" id="searchCount"></span>
+      </div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Wpisz nazwę zespołu, np. Dżem, Kult, Hunter…" autocomplete="off">
+      <div class="cards" id="searchResults" style="margin-top:22px;">
+        <div class="empty-line">Wpisz nazwę zespołu, aby zobaczyć nadchodzące koncerty.</div>
+      </div>
+    </div>
+  </div>
+
   <footer>Dane koncertowe aktualizowane ręcznie · wybrane zespoły polskiej sceny rockowej i alternatywnej.</footer>
 </div>
 
 <script>
+// row/col use an "odd-r" offset hex grid: odd rows are shifted right by
+// half a hex width, which is what makes adjacent rows interlock and touch.
 const REGIONS = [
-  { key:'zachodniopomorskie', name:'Zachodnio­pomorskie' },
-  { key:'pomorskie', name:'Pomorskie' },
-  { key:'warminsko-mazurskie', name:'Warmińsko-Mazurskie' },
-  { key:'podlaskie', name:'Podlaskie' },
-  { key:'lubuskie', name:'Lubuskie' },
-  { key:'wielkopolskie', name:'Wielkopolskie' },
-  { key:'kujawsko-pomorskie', name:'Kujawsko-Pomorskie' },
-  { key:'mazowieckie', name:'Mazowieckie' },
-  { key:'lubelskie', name:'Lubelskie' },
-  { key:'dolnoslaskie', name:'Dolnośląskie' },
-  { key:'lodzkie', name:'Łódzkie' },
-  { key:'swietokrzyskie', name:'Świętokrzyskie' },
-  { key:'opolskie', name:'Opolskie' },
-  { key:'slaskie', name:'Śląskie' },
-  { key:'malopolskie', name:'Małopolskie' },
-  { key:'podkarpackie', name:'Podkarpackie' },
+  { key:'zachodniopomorskie', name:'Zachodnio­pomorskie', row:0, col:1 },
+  { key:'pomorskie', name:'Pomorskie', row:0, col:2 },
+  { key:'warminsko-mazurskie', name:'Warmińsko-Mazurskie', row:0, col:3 },
+
+  { key:'lubuskie', name:'Lubuskie', row:1, col:0 },
+  { key:'wielkopolskie', name:'Wielkopolskie', row:1, col:1 },
+  { key:'kujawsko-pomorskie', name:'Kujawsko-Pomorskie', row:1, col:2 },
+  { key:'podlaskie', name:'Podlaskie', row:1, col:3 },
+
+  { key:'dolnoslaskie', name:'Dolnośląskie', row:2, col:0 },
+  { key:'lodzkie', name:'Łódzkie', row:2, col:1 },
+  { key:'mazowieckie', name:'Mazowieckie', row:2, col:2 },
+  { key:'lubelskie', name:'Lubelskie', row:2, col:3 },
+
+  { key:'opolskie', name:'Opolskie', row:3, col:0 },
+  { key:'slaskie', name:'Śląskie', row:3, col:1 },
+  { key:'swietokrzyskie', name:'Świętokrzyskie', row:3, col:2 },
+
+  { key:'malopolskie', name:'Małopolskie', row:4, col:1 },
+  { key:'podkarpackie', name:'Podkarpackie', row:4, col:2 },
 ];
 
-const ROWS = [
-  ['zachodniopomorskie','pomorskie','warminsko-mazurskie','podlaskie'],
-  ['lubuskie','wielkopolskie','kujawsko-pomorskie','mazowieckie','lubelskie'],
-  ['dolnoslaskie','lodzkie','swietokrzyskie'],
-  ['opolskie','slaskie','malopolskie','podkarpackie'],
+const HEX_W = 78;
+const HEX_H = 90;
+const ROW_STEP = HEX_H * 0.75;   // vertical distance between row tops
+const COL_STEP = HEX_W;          // horizontal distance between columns
+const ROW_OFFSET_X = HEX_W / 2;  // shift for odd rows
+
+function hexPixelPos(row, col){
+  const x = col * COL_STEP + (row % 2 === 1 ? ROW_OFFSET_X : 0);
+  const y = row * ROW_STEP;
+  return { x, y };
+}
+
+const EVENTS = [
+  { name:'Pol\'and\'Rock Festival', place:'Lotnisko Czaplinek-Broczyno (woj. zachodniopomorskie)', past:['30 lipca – 1 sierpnia 2026', '31 lipca – 2 sierpnia 2025'], next:['przełom lipca i sierpnia 2027'] },
+  { name:'Rockowizna', place:'Gdańsk (Polsat Plus Arena), Poznań (Lotnisko Ławica), Kraków (Lotnisko Rakowice-Czyżyny)', past:['Gdańsk: 7–8 sierpnia 2026', 'Poznań: 20–22 sierpnia 2026', 'Kraków: 28–29 sierpnia 2026'], next:['sierpień 2027'] },
+  { name:'Jarocin Festiwal', place:'Jarocin (ul. Maratońska / tereny festiwalowe, woj. wielkopolskie)', past:['17–19 lipca 2026', '17–20 lipca 2025'], next:['lipiec 2027'] },
+  { name:'Czochraj Bobra Fest', place:'Namysłów (Błonie Namysłowskie, woj. opolskie)', past:['11–13 lipca 2024'], next:['edycje 2025–2026 nie odbyły się (dalsze terminy do ogłoszenia)'] },
+  { name:'Antoniów Rock Fest', place:'Radoszyce (nad Zalewem Antoniów, woj. świętokrzyskie)', past:['3–4 lipca 2026'], next:['2–3 lipca 2027'] },
+  { name:'Festiwal Pieśni Zbuntowanej', place:'Doły Biskupie (Kamieniołom „Doły Opacie”, woj. świętokrzyskie)', past:['12–14 lipca 2024'], next:['9–11 lipca 2027 (VII edycja)'] },
+  { name:'ZEW się budzi Festiwal', place:'Cisna (Bieszczady, woj. podkarpackie)', past:['26–28 czerwca 2026', '30 maja – 1 czerwca 2025'], next:['czerwiec 2027'] },
+  { name:'Dni Ursynowa', place:'Warszawa (Park im. R. Kozłowskiego przy Kopie Cwila, woj. mazowieckie)', past:['12–13 czerwca 2026', '14–15 czerwca 2025'], next:['czerwiec 2027'] },
+  { name:'Mystic Festival', place:'Gdańsk (teren Stoczni Gdańskiej)', past:['3–6 czerwca 2026', '4–7 czerwca 2025'], next:['czerwiec 2027'] },
+  { name:'Hells Bells Festival', place:'Szczecin (Łasztownia / Plac Gryfitów)', past:['26–27 czerwca 2026 (I edycja)'], next:['czerwiec 2027'] },
+  { name:'Bangarang Festival', place:'Chwałkowo k. Krobi (woj. wielkopolskie)', past:['26–27 czerwca 2026', '27–28 czerwca 2025'], next:['czerwiec 2027'] },
+  { name:'Paletstock', place:'Bełżyce k. Lublina (woj. lubelskie)', past:['14–15 sierpnia 2026', '15–16 sierpnia 2025'], next:['sierpień 2027'] },
+  { name:'Był Kiedyś Jarocin (cykl halowy)', place:'Gdańsk (Klub B90), Warszawa (Klub Stodoła), Kraków, Wrocław', past:['13 grudnia 2025 (Warszawa)', '2 marca 2024 (Warszawa)'], next:['11–13 grudnia 2026 (Gdańsk)'] },
+  { name:'Rock na Bagnie', place:'Goniądz (Plaża Miejska nad Biebrzą, woj. podlaskie)', past:['3–4 lipca 2026', '4–5 lipca 2025'], next:['lipiec 2027'] },
+  { name:'Rockowisko Zwierzyniec', place:'Zwierzyniec (Park Środowiskowy, woj. lubelskie)', past:['3–4 lipca 2026', '4–5 lipca 2025'], next:['lipiec 2027'] },
+  { name:'OFF Festival', place:'Katowice (Dolina Trzech Stawów, woj. śląskie)', past:['7–9 sierpnia 2026', '1–3 sierpnia 2025'], next:['sierpień 2027'] },
+  { name:'Cieszanów Rock Festival', place:'Cieszanów (woj. podkarpackie)', past:['13–15 sierpnia 2026', '14–16 sierpnia 2025'], next:['sierpnia 2027'] },
+  { name:'Zakręć Śmigłem Fest', place:'Mikstat (woj. wielkopolskie)', past:['14–15 sierpnia 2026'], next:['6–7 sierpnia 2027'] },
+  { name:'Ustrzycki Festiwal Rockowy', place:'Ustrzyki Dolne (Stadion Miejski, woj. podkarpackie)', past:['14–15 sierpnia 2026', '15–16 sierpnia 2025'], next:['sierpień 2027'] },
 ];
-const ROW_OFFSET = [false, true, false, true];
+
+function eventLines(arr){
+  return arr.map(l => `<span class="ev-line">${l}</span>`).join('');
+}
+
+function renderEvents(){
+  const tbody = document.getElementById('eventsTbody');
+  tbody.innerHTML = EVENTS.map((ev, i) => `
+    <tr>
+      <td class="ev-lp">${i + 1}</td>
+      <td class="ev-name">${ev.name}</td>
+      <td class="ev-place">${ev.place}</td>
+      <td class="ev-past">${eventLines(ev.past)}</td>
+      <td class="ev-next">${eventLines(ev.next)}</td>
+    </tr>
+  `).join('');
+}
+
+renderEvents();
 
 const DATA = {
-  swietokrzyskie: {
+  zachodniopomorskie: {
     paid: [
-      { band:'Kult', city:'Kielce', venue:'Amfiteatr Kadzielnia', date:'26 września 2026', tour:'PGS Rock Festival IV Edycja' },
-      { band:'Pull the Wire', city:'Skarżysko-Kamienna', venue:'Klub SEMAFOR', date:'10 października 2026', tour:'Trasa koncertowa 2026' },
-      { band:'Koniec Świata', city:'Kielce', venue:'Studencki Klub WSPAK', date:'28 listopada 2026', tour:'Trasa 2026' },
+      { band:'TSA MNKWL', city:'Szczecin', venue:'Klub Muzyczny', date:'18 września 2026', sortDate:'2026-09-18', tour:'Trasa koncertowa 2026' },
+      { band:'The Analogs', city:'Kołobrzeg', venue:'Klub Muzyczny', date:'18 września 2026', sortDate:'2026-09-18', tour:'Trasa koncertowa 2026' },
     ],
     free: [],
   },
-  malopolskie: {
+  pomorskie: {
     paid: [
-      { band:'Strachy na Lachy', city:'Kraków', venue:'Klub Kwadrat', date:'17 października 2026', tour:'Koncert klubowy' },
-      { band:'Koniec Świata', city:'Kraków', venue:'Klub Zaścianek', date:'23 października 2026', tour:'Trasa 2026' },
-      { band:'Koniec Świata', city:'Tarnów', venue:'Piwnica „Przepraszam”', date:'6 listopada 2026', tour:'Trasa 2026' },
-      { band:'Myslovitz', city:'Kraków', venue:'Klub STUDIO', date:'27 listopada 2026', tour:'Trasa „DLA CIEBIE wpadłem w głęboką depresję OSTATNI RAZ” / Korova Milky Bar' },
+      { band:'Koniec Świata', city:'Gdynia', venue:'Klub Muzyczny', date:'9 października 2026', sortDate:'2026-10-09', tour:'Trasa koncertowa 2026' },
+      { band:'Hunter', city:'Gdynia', venue:'Podwórko Art', date:'10 października 2026', sortDate:'2026-10-10', tour:'Hunter Przeciwko Wojnie, Przemocy i Manipulacji Vol. II' },
+      { band:'Illusion', city:'Gdynia', venue:'Klub Muzyczny', date:'23 października 2026', sortDate:'2026-10-23', tour:'Trasa koncertowa 2026' },
+      { band:'Dżem', city:'Gdańsk', venue:'Polska Filharmonia Bałtycka', date:'8 listopada 2026', sortDate:'2026-11-08', tour:'Trasa koncertowa 2026' },
+      { band:'WaluśKraksaKryzys', city:'Gdańsk', venue:'Inside Seaside', date:'14 listopada 2026', sortDate:'2026-11-14', tour:'Inside Seaside Festival' },
+      { band:'T.Love', city:'Gdańsk', venue:'Klub B90', date:'15 listopada 2026', sortDate:'2026-11-15', tour:'Trasa Orajt!' },
+      { band:'Sztywny Pal Azji', city:'Gdynia', venue:'Teatr Muzyczny', date:'25 listopada 2026', sortDate:'2026-11-25', tour:'Trasa koncertowa z Kobranocką i Różami Europy' },
+      { band:'TSA MNKWL', city:'Gdynia', venue:'Klub Muzyczny', date:'4 grudnia 2026', sortDate:'2026-12-04', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  'warminsko-mazurskie': {
+    paid: [
+      { band:'Dżem', city:'Olsztyn', venue:'Hala Urania', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  podlaskie: {
+    paid: [
+      { band:'The Analogs', city:'Suwałki', venue:'Klub Muzyczny', date:'19 września 2026', sortDate:'2026-09-19', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  wielkopolskie: {
+    paid: [
+      { band:'Kobranocka', city:'Orle Wielkie', venue:'Winnica Orle', date:'18 września 2026', sortDate:'2026-09-18', tour:'Muzyczne święto w Winnicy Orle' },
+      { band:'Koniec Świata', city:'Poznań', venue:'Klub Muzyczny', date:'17 października 2026', sortDate:'2026-10-17', tour:'Trasa koncertowa 2026' },
+      { band:'Luxtorpeda', city:'Damasławek', venue:'GOK Damasławek', date:'7 listopada 2026', sortDate:'2026-11-07', tour:'Trasa Szukamy Guza 2026' },
+      { band:'Illusion', city:'Poznań', venue:'Klub Muzyczny', date:'4 grudnia 2026', sortDate:'2026-12-04', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  'kujawsko-pomorskie': {
+    paid: [
+      { band:'The Analogs', city:'Grudziądz', venue:'Klub Muzyczny', date:'25 września 2026', sortDate:'2026-09-25', tour:'Trasa koncertowa 2026' },
+      { band:'Hunter', city:'Toruń', venue:'Klub Lizard King', date:'4 października 2026', sortDate:'2026-10-04', tour:'Hunter Przeciwko Wojnie, Przemocy i Manipulacji Vol. II' },
+      { band:'Koniec Świata', city:'Bydgoszcz', venue:'Klub Muzyczny', date:'30 października 2026', sortDate:'2026-10-30', tour:'Trasa koncertowa 2026' },
+      { band:'Pudelsi', city:'Bydgoszcz', venue:'Over the Under Pub', date:'14 listopada 2026', sortDate:'2026-11-14', tour:'Trasa koncertowa 2026' },
+      { band:'Lady Pank', city:'Toruń', venue:'Arena Toruń', date:'15 listopada 2026', sortDate:'2026-11-15', tour:'Trasa koncertowa 2026' },
+      { band:'Farben Lehre', city:'Toruń', venue:'Klub Muzyczny', date:'20 grudnia 2026', sortDate:'2026-12-20', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  mazowieckie: {
+    paid: [
+      { band:'TSA MNKWL', city:'Płock', venue:'Rock 69', date:'26 września 2026', sortDate:'2026-09-26', tour:'Trasa koncertowa 2026' },
+      { band:'Strachy na Lachy', city:'Warszawa', venue:'Klub Palladium', date:'3 października 2026', sortDate:'2026-10-03', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Warszawa', venue:'Klub Muzyczny', date:'10 października 2026', sortDate:'2026-10-10', tour:'Trasa koncertowa 2026' },
+      { band:'Happysad', city:'Warszawa', venue:'Klub Stodoła', date:'15 października 2026', sortDate:'2026-10-15', tour:'XXV TOUR' },
+      { band:'Sztywny Pal Azji', city:'Warszawa', venue:'Terminal Kultury Gocław', date:'28 października 2026', sortDate:'2026-10-28', tour:'Trasa z zespołami Kobranocka i Róże Europy' },
+      { band:'Kobranocka', city:'Warszawa', venue:'Terminal Kultury Gocław', date:'28 października 2026', sortDate:'2026-10-28', tour:'Trasa z zespołami Sztywny Pal Azji i Róże Europy' },
+      { band:'Hunter', city:'Warszawa', venue:'Klub Progresja', date:'1 listopada 2026', sortDate:'2026-11-01', tour:'Hunter Przeciwko Wojnie, Przemocy i Manipulacji Vol. II' },
+      { band:'WaluśKraksaKryzys', city:'Warszawa', venue:'Klub Stodoła', date:'5 listopada 2026', sortDate:'2026-11-05', tour:'Trasa z zespołem HOUK' },
+      { band:'Kult', city:'Warszawa', venue:'Klub Stodoła', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa Pomarańczowa 2026' },
+      { band:'Illusion', city:'Warszawa', venue:'Klub Muzyczny', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa koncertowa 2026' },
+      { band:'Dżem', city:'Radom', venue:'Enea RCS', date:'13 listopada 2026', sortDate:'2026-11-13', tour:'Trasa koncertowa 2026' },
+      { band:'T.Love', city:'Warszawa', venue:'Klub Stodoła', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Trasa Orajt!' },
+      { band:'Dżem', city:'Warszawa', venue:'Klub Stodoła', date:'4 grudnia 2026', sortDate:'2026-12-04', tour:'Trasa koncertowa 2026' },
+      { band:'Myslovitz', city:'Warszawa', venue:'Klub Stodoła', date:'11 grudnia 2026', sortDate:'2026-12-11', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  lubelskie: {
+    paid: [
+      { band:'Lady Pank', city:'Lublin', venue:'Hala Globus', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa koncertowa 2026' },
+      { band:'Illusion', city:'Lublin', venue:'Klub Muzyczny', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Trasa koncertowa 2026' },
+      { band:'Dżem', city:'Lublin', venue:'Centrum Spotkania Kultur', date:'14 grudnia 2026', sortDate:'2026-12-14', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  dolnoslaskie: {
+    paid: [
+      { band:'Dżem', city:'Wrocław', venue:'Narodowe Forum Muzyki', date:'21 września 2026', sortDate:'2026-09-21', tour:'Trasa koncertowa 2026' },
+      { band:'Strachy na Lachy', city:'Wrocław', venue:'Klub Muzyczny', date:'10 października 2026', sortDate:'2026-10-10', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Wrocław', venue:'Klub Muzyczny', date:'16 października 2026', sortDate:'2026-10-16', tour:'Trasa koncertowa 2026' },
+      { band:'Happysad', city:'Wrocław', venue:'Stary Klasztor', date:'8 listopada 2026', sortDate:'2026-11-08', tour:'XXV TOUR' },
+      { band:'Kult', city:'Wrocław', venue:'Terminal Event Center', date:'15 listopada 2026', sortDate:'2026-11-15', tour:'Trasa Pomarańczowa 2026' },
+      { band:'Myslovitz', city:'Wrocław', venue:'Hala Stulecia', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'One Love Wrocław Music Festival 2026' },
+      { band:'Illusion', city:'Wrocław', venue:'Klub Muzyczny', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Trasa koncertowa 2026' },
+      { band:'WaluśKraksaKryzys', city:'Wrocław', venue:'Zaklęte Rewiry', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Trasa koncertowa 2026' },
+      { band:'TSA MNKWL', city:'Wrocław', venue:'Klub Muzyczny', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  lodzkie: {
+    paid: [
+      { band:'WaluśKraksaKryzys', city:'Łódź', venue:'Klub Muzyczny', date:'26 października 2026', sortDate:'2026-10-26', tour:"Soundedit'26 w hołdzie Robertowi Brylewskiemu" },
+      { band:'Kult', city:'Łódź', venue:'Klub Wytwórnia', date:'30 października 2026', sortDate:'2026-10-30', tour:'Trasa Pomarańczowa 2026' },
+      { band:'Koniec Świata', city:'Łódź', venue:'Klub Muzyczny', date:'31 października 2026', sortDate:'2026-10-31', tour:'Trasa koncertowa 2026' },
+      { band:'Coma', city:'Łódź', venue:'Atlas Arena', date:'13 listopada 2026', sortDate:'2026-11-13', tour:'Armia Zaprzepaszczonych' },
+      { band:'Illusion', city:'Łódź', venue:'Klub Scenografia', date:'27 listopada 2026', sortDate:'2026-11-27', tour:'Trasa koncertowa 2026' },
+      { band:'Dżem', city:'Łódź', venue:'Klub Wytwórnia', date:'6 grudnia 2026', sortDate:'2026-12-06', tour:'Trasa koncertowa 2026' },
+    ],
+    free: [],
+  },
+  swietokrzyskie: {
+    paid: [
+      { band:'Lady Pank', city:'Kielce', venue:'Amfiteatr Kadzielnia', date:'19 września 2026', sortDate:'2026-09-19', tour:'Trasa koncertowa 2026' },
+      { band:'Kult', city:'Kielce', venue:'Amfiteatr Kadzielnia', date:'26 września 2026', sortDate:'2026-09-26', tour:'PGS Rock Festival IV Edycja' },
+      { band:'Pull the Wire', city:'Skarżysko-Kamienna', venue:'Klub SEMAFOR', date:'10 października 2026', sortDate:'2026-10-10', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Kielce', venue:'Studencki Klub WSPAK', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Trasa 2026' },
+      { band:'Enej', city:'Kielce', venue:'Kieleckie Centrum Kultury', date:'14 grudnia 2026', sortDate:'2026-12-14', tour:'Kolędowanie z zespołem Enej' },
+    ],
+    free: [],
+  },
+  opolskie: {
+    paid: [
+      { band:'Lady Pank', city:'Opole', venue:'Narodowe Centrum Polskiej Piosenki', date:'18 września 2026', sortDate:'2026-09-18', tour:'Trasa koncertowa 2026' },
+      { band:'Farben Lehre', city:'Opole', venue:'Bar U Kuby', date:'19 września 2026', sortDate:'2026-09-19', tour:'Trasa koncertowa 2026' },
+      { band:'Dżem', city:'Opole', venue:'Centrum Wystawienniczo-Kongresowe', date:'24 października 2026', sortDate:'2026-10-24', tour:'Trasa koncertowa 2026' },
     ],
     free: [],
   },
   slaskie: {
     paid: [
-      { band:'Pull the Wire', city:'Rybnik', venue:'Klub Odyseja', date:'9 października 2026', tour:'Trasa koncertowa 2026' },
-      { band:'Strachy na Lachy', city:'Zabrze', venue:'Klub CK Wiatrak', date:'13 listopada 2026', tour:'Koncert klubowy' },
-      { band:'Koniec Świata', city:'Częstochowa', venue:'Klub Muzyczna Meta', date:'13 listopada 2026', tour:'Trasa 2026' },
-      { band:'Kult', city:'Katowice', venue:'Hala Spodek', date:'14 listopada 2026', tour:'Trasa Pomarańczowa 2026' },
-      { band:'Myslovitz', city:'Katowice', venue:'Hala Spodek', date:'15 listopada 2026', tour:'Korova Milky Bar 2026' },
-      { band:'Koniec Świata', city:'Bielsko-Biała', venue:'Rudeboy Club', date:'21 listopada 2026', tour:'Trasa 2026' },
-      { band:'Koniec Świata', city:'Sosnowiec', venue:'Komin Music Cafe', date:'27 listopada 2026', tour:'Trasa 2026' },
-      { band:'Koniec Świata', city:'Gliwice', venue:'Klub Studencki „Spirala”', date:'5 grudnia 2026', tour:'Trasa 2026' },
+      { band:'Pull the Wire', city:'Rybnik', venue:'Klub Odyseja', date:'9 października 2026', sortDate:'2026-10-09', tour:'Trasa koncertowa 2026' },
+      { band:'Illusion', city:'Bielsko-Biała', venue:'Klub Muzyczny', date:'24 października 2026', sortDate:'2026-10-24', tour:'Trasa koncertowa 2026' },
+      { band:'The Analogs', city:'Częstochowa', venue:'Klub Muzyczny', date:'30 października 2026', sortDate:'2026-10-30', tour:'Trasa koncertowa 2026' },
+      { band:'Strachy na Lachy', city:'Zabrze', venue:'Klub CK Wiatrak', date:'13 listopada 2026', sortDate:'2026-11-13', tour:'Koncert klubowy' },
+      { band:'Koniec Świata', city:'Częstochowa', venue:'Klub Muzyczna Meta', date:'13 listopada 2026', sortDate:'2026-11-13', tour:'Trasa 2026' },
+      { band:'Dżem', city:'Bielsko-Biała', venue:'Cavatina Hall', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa koncertowa 2026' },
+      { band:'Akurat', city:'Sosnowiec', venue:'Komin Music Cafe', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa koncertowa 2026' },
+      { band:'Kult', city:'Katowice', venue:'Hala Spodek', date:'14 listopada 2026', sortDate:'2026-11-14', tour:'Trasa Pomarańczowa 2026' },
+      { band:'Myslovitz', city:'Katowice', venue:'Hala Spodek', date:'15 listopada 2026', sortDate:'2026-11-15', tour:'Korova Milky Bar 2026' },
+      { band:'The Analogs', city:'Bielsko-Biała', venue:'Rudeboy Club', date:'11 listopada 2026', sortDate:'2026-11-11', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Bielsko-Biała', venue:'Rudeboy Club', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Trasa 2026' },
+      { band:'Illusion', city:'Zabrze', venue:'CK Wiatrak', date:'20 listopada 2026', sortDate:'2026-11-20', tour:'Trasa koncertowa 2026' },
+      { band:'Koniec Świata', city:'Sosnowiec', venue:'Komin Music Cafe', date:'27 listopada 2026', sortDate:'2026-11-27', tour:'Trasa 2026' },
+      { band:'Happysad', city:'Katowice', venue:'P23', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'25 lat zespołu' },
+      { band:'Nocny Kochanek', city:'Zabrze', venue:'CK Wiatrak', date:'28 listopada 2026', sortDate:'2026-11-28', tour:'Hewi Metalowe Jaja na Trasie' },
+      { band:'Koniec Świata', city:'Gliwice', venue:'Klub Studencki „Spirala”', date:'5 grudnia 2026', sortDate:'2026-12-05', tour:'Trasa 2026' },
+      { band:'Dżem', city:'Częstochowa', venue:'Filharmonia Częstochowska', date:'12 grudnia 2026', sortDate:'2026-12-12', tour:'Trasa koncertowa 2026' },
     ],
     free: [
-      { band:'Kult', city:'Tychy', venue:'Miejski Park Solidarności', date:'26–28 czerwca 2026', tour:'Święto Miasta Tychy (Obchody 75-lecia Tychów)', note:'Wydarzenie plenerowe z zeszłorocznej edycji obchodów — sprawdź aktualność terminu przed wyjazdem.' },
+      { band:'Kult', city:'Tychy', venue:'Miejski Park Solidarności', date:'26–28 czerwca 2026', sortDate:'2026-06-26', tour:'Święto Miasta Tychy (Obchody 75-lecia Tychów)', note:'Wydarzenie plenerowe z zeszłorocznej edycji obchodów — sprawdź aktualność terminu przed wyjazdem.' },
     ],
   },
+  malopolskie: {
+    paid: [
+      { band:'Strachy na Lachy', city:'Kraków', venue:'Klub Kwadrat', date:'17 października 2026', sortDate:'2026-10-17', tour:'Koncert klubowy' },
+      { band:'Nocny Kochanek', city:'Kraków', venue:'Klub Studio', date:'9 października 2026', sortDate:'2026-10-09', tour:'Hewi Metalowe Jaja na Trasie' },
+      { band:'Koniec Świata', city:'Kraków', venue:'Klub Zaścianek', date:'23 października 2026', sortDate:'2026-10-23', tour:'Trasa 2026' },
+      { band:'Hunter', city:'Kraków', venue:'Klub Studio', date:'23 października 2026', sortDate:'2026-10-23', tour:'Hunter Przeciwko Wojnie, Przemocy i Manipulacji Vol. II' },
+      { band:'Koniec Świata', city:'Tarnów', venue:'Piwnica „Przepraszam”', date:'6 listopada 2026', sortDate:'2026-11-06', tour:'Trasa 2026' },
+      { band:'T.Love', city:'Kraków', venue:'Klub Studio', date:'25 października 2026', sortDate:'2026-10-25', tour:'Trasa Orajt!' },
+      { band:'WaluśKraksaKryzys', city:'Kraków', venue:'Klub Studio', date:'3 listopada 2026', sortDate:'2026-11-03', tour:'Trasa z zespołem HOUK' },
+      { band:'Myslovitz', city:'Kraków', venue:'Klub STUDIO', date:'27 listopada 2026', sortDate:'2026-11-27', tour:'Trasa „DLA CIEBIE wpadłem w głęboką depresję OSTATNI RAZ” / Korova Milky Bar' },
+      { band:'Happysad', city:'Kraków', venue:'Klub Kwadrat', date:'27 listopada 2026', sortDate:'2026-11-27', tour:'25 lat zespołu' },
+      { band:'Illusion', city:'Kraków', venue:'Klub Kwadrat', date:'5 grudnia 2026', sortDate:'2026-12-05', tour:'Trasa koncertowa 2026' },
+      { band:'Enej', city:'Nowy Targ', venue:'Miejskie Centrum Kultury', date:'16 grudnia 2026', sortDate:'2026-12-16', tour:'Kolędowanie z zespołem Enej' },
+      { band:'KSU', city:'Kraków', venue:'Klub Muzyczny', date:'19 grudnia 2026', sortDate:'2026-12-19', tour:'Trasa 65 lat pod prąd' },
+      { band:'Enej', city:'Kraków', venue:'Nowohuckie Centrum Kultury', date:'28 grudnia 2026', sortDate:'2026-12-28', tour:'Kolędowanie z zespołem Enej' },
+    ],
+    free: [],
+  },
+  podkarpackie: {
+    paid: [
+      { band:'Koniec Świata', city:'Rzeszów', venue:'Klub Muzyczny', date:'24 października 2026', sortDate:'2026-10-24', tour:'Trasa koncertowa 2026' },
+      { band:'KSU', city:'Mielec', venue:'Hala MOSiR', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Filharmonia Akustycznie' },
+      { band:'Farben Lehre', city:'Dukla', venue:'Klub Muzyczny', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Trasa koncertowa z The Analogs' },
+      { band:'The Analogs', city:'Dukla', venue:'Klub Muzyczny', date:'21 listopada 2026', sortDate:'2026-11-21', tour:'Trasa koncertowa z Farben Lehre' },
+      { band:'Enej', city:'Krosno', venue:'Regionalne Centrum Kultur Pogranicza', date:'15 grudnia 2026', sortDate:'2026-12-15', tour:'Kolędowanie z zespołem Enej' },
+    ],
+    free: [],
+  },
 };
+
+/* ---------- flat list of all items (used by band search) ---------- */
+
+const ALL_ITEMS = [];
+REGIONS.forEach(info => {
+  const d = DATA[info.key];
+  if(!d) return;
+  d.free.forEach(item => ALL_ITEMS.push({ ...item, regionName: info.name, type:'free' }));
+  d.paid.forEach(item => ALL_ITEMS.push({ ...item, regionName: info.name, type:'paid' }));
+});
+ALL_ITEMS.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
 const hexgrid = document.getElementById('hexgrid');
 const panel = document.getElementById('panel');
@@ -394,28 +861,35 @@ function regionName(key){
   return REGIONS.find(r => r.key === key).name;
 }
 
-ROWS.forEach((row, i) => {
-  const rowEl = document.createElement('div');
-  rowEl.className = 'hexrow' + (ROW_OFFSET[i] ? ' offset' : '');
-  row.forEach(key => {
-    const info = REGIONS.find(r => r.key === key);
-    const d = DATA[key];
-    const hasData = d && (d.paid.length || d.free.length);
+let maxX = 0, maxY = 0;
 
-    const btn = document.createElement('button');
-    btn.className = 'hex' + (hasData ? ' has-data' : '');
-    btn.dataset.key = key;
-    btn.innerHTML = `<span class="hex-name">${info.name}</span>` + (hasData ? '<span class="hex-dot"></span>' : '');
-    btn.addEventListener('click', () => selectRegion(key));
-    rowEl.appendChild(btn);
-  });
-  hexgrid.appendChild(rowEl);
+REGIONS.forEach(info => {
+  const { x, y } = hexPixelPos(info.row, info.col);
+  maxX = Math.max(maxX, x + HEX_W);
+  maxY = Math.max(maxY, y + HEX_H);
+
+  const d = DATA[info.key];
+  const hasData = d && (d.paid.length || d.free.length);
+
+  const btn = document.createElement('button');
+  btn.className = 'hex' + (hasData ? ' has-data' : '');
+  btn.dataset.key = info.key;
+  btn.style.left = x + 'px';
+  btn.style.top = y + 'px';
+  btn.innerHTML = `<span class="hex-name">${info.name}</span>` + (hasData ? '<span class="hex-dot"></span>' : '');
+  btn.addEventListener('click', () => selectRegion(info.key));
+  hexgrid.appendChild(btn);
 });
 
-function ticketCard(item, type){
+hexgrid.style.width = maxX + 'px';
+hexgrid.style.height = maxY + 'px';
+
+function ticketCard(item, type, showRegion){
   const noteHtml = item.note ? `<div class="ticket-note">${item.note}</div>` : '';
+  const regionHtml = showRegion ? `<span class="region-tag">${item.regionName}</span>` : '';
   return `
     <div class="ticket ${type}">
+      ${regionHtml}
       <p class="ticket-band">${item.band}</p>
       <p class="ticket-meta"><span class="city">${item.city}</span> — <span class="venue">${item.venue}</span></p>
       <p class="ticket-date">${item.date}</p>
@@ -443,13 +917,13 @@ function selectRegion(key){
     return;
   }
 
-  const paidHtml = d.paid.length
-    ? `<div class="cards">${d.paid.map(i => ticketCard(i, 'paid')).join('')}</div>`
-    : `<div class="empty-line">Brak ogłoszonych płatnych koncertów wybranych zespołów w tym regionie.</div>`;
-
   const freeHtml = d.free.length
     ? `<div class="cards">${d.free.map(i => ticketCard(i, 'free')).join('')}</div>`
     : `<div class="empty-line">Brak ogłoszonych bezpłatnych koncertów wybranych zespołów w tym regionie.</div>`;
+
+  const paidHtml = d.paid.length
+    ? `<div class="cards">${d.paid.map(i => ticketCard(i, 'paid')).join('')}</div>`
+    : `<div class="empty-line">Brak ogłoszonych płatnych koncertów wybranych zespołów w tym regionie.</div>`;
 
   panel.innerHTML = `
     <div class="region-head">
@@ -457,17 +931,115 @@ function selectRegion(key){
       <span class="region-count">${total} ${total === 1 ? 'koncert' : 'koncertów'}</span>
     </div>
 
-    <section class="group">
-      <div class="group-title paid"><span class="dot"></span><h3>Płatne</h3><span class="rule"></span></div>
-      ${paidHtml}
-    </section>
-
-    <section class="group">
-      <div class="group-title free"><span class="dot"></span><h3>Darmowe</h3><span class="rule"></span></div>
-      ${freeHtml}
-    </section>
+    <div class="split">
+      <div class="split-col">
+        <div class="group-title free"><span class="dot"></span><h3>Darmowe</h3><span class="rule"></span></div>
+        ${freeHtml}
+      </div>
+      <div class="split-col">
+        <div class="group-title paid"><span class="dot"></span><h3>Płatne</h3><span class="rule"></span></div>
+        ${paidHtml}
+      </div>
+    </div>
   `;
 }
+
+/* ---------- default chronological list (all regions) ---------- */
+
+function renderAllList(){
+  const freeAll = [];
+  const paidAll = [];
+
+  REGIONS.forEach(info => {
+    const d = DATA[info.key];
+    if(!d) return;
+    d.free.forEach(item => freeAll.push({ ...item, regionName: info.name }));
+    d.paid.forEach(item => paidAll.push({ ...item, regionName: info.name }));
+  });
+
+  freeAll.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+  paidAll.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+
+  const freeContainer = document.getElementById('freeAllCards');
+  const paidContainer = document.getElementById('paidAllCards');
+
+  freeContainer.innerHTML = freeAll.length
+    ? freeAll.map(i => ticketCard(i, 'free', true)).join('')
+    : `<div class="empty-line">Brak ogłoszonych bezpłatnych koncertów wybranych zespołów.</div>`;
+
+  paidContainer.innerHTML = paidAll.length
+    ? paidAll.map(i => ticketCard(i, 'paid', true)).join('')
+    : `<div class="empty-line">Brak ogłoszonych płatnych koncertów wybranych zespołów.</div>`;
+}
+
+renderAllList();
+
+/* ---------- band search ---------- */
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+const searchCount = document.getElementById('searchCount');
+
+function renderSearchResults(){
+  const q = searchInput.value.trim().toLowerCase();
+
+  if(!q){
+    searchResults.innerHTML = `<div class="empty-line">Wpisz nazwę zespołu, aby zobaczyć nadchodzące koncerty.</div>`;
+    searchCount.textContent = '';
+    return;
+  }
+
+  const matches = ALL_ITEMS.filter(i => i.band.toLowerCase().includes(q));
+  searchCount.textContent = matches.length ? `${matches.length} ${matches.length === 1 ? 'wynik' : 'wyników'}` : '';
+  searchResults.innerHTML = matches.length
+    ? matches.map(i => ticketCard(i, i.type, true)).join('')
+    : `<div class="empty-line">Brak zapowiedzianych koncertów dla „${searchInput.value.trim()}”.</div>`;
+}
+
+searchInput.addEventListener('input', renderSearchResults);
+
+/* ---------- view switching (lista / mapa / wydarzenia / wyszukiwarka) ---------- */
+
+const mapToggle = document.getElementById('mapToggle');
+const eventsToggle = document.getElementById('eventsToggle');
+const bandSearchToggle = document.getElementById('bandSearchToggle');
+const listView = document.getElementById('listView');
+const mapView = document.getElementById('mapView');
+const eventsView = document.getElementById('eventsView');
+const searchView = document.getElementById('searchView');
+const toolbarHint = document.getElementById('toolbarHint');
+
+const HINTS = {
+  list: 'Kliknij, aby wybrać województwo na mapie.',
+  map: 'Kliknij dowolny sześciokąt, aby zawęzić listę do jednego województwa.',
+  events: 'Największe festiwale i cykliczne wydarzenia — daty ostatnich i nadchodzących edycji.',
+  search: 'Wpisz nazwę zespołu, aby zobaczyć wszystkie jego zapowiedziane koncerty.',
+};
+
+let currentView = 'list';
+
+function setView(view){
+  currentView = (currentView === view) ? 'list' : view;
+
+  listView.style.display = currentView === 'list' ? 'grid' : 'none';
+  mapView.style.display = currentView === 'map' ? 'grid' : 'none';
+  eventsView.style.display = currentView === 'events' ? 'block' : 'none';
+  searchView.style.display = currentView === 'search' ? 'block' : 'none';
+
+  mapToggle.classList.toggle('active', currentView === 'map');
+  eventsToggle.classList.toggle('active', currentView === 'events');
+  bandSearchToggle.classList.toggle('active', currentView === 'search');
+
+  toolbarHint.textContent = HINTS[currentView];
+
+  if(currentView === 'search'){
+    searchInput.focus();
+  }
+}
+
+mapToggle.addEventListener('click', () => setView('map'));
+eventsToggle.addEventListener('click', () => setView('events'));
+bandSearchToggle.addEventListener('click', () => setView('search'));
 </script>
 </body>
 </html>
