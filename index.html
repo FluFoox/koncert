@@ -173,13 +173,13 @@ header.hero{
 
 .region-tag{
   display:inline-block;
-  font-size:11px;
+  font-size:10.5px;
   color:var(--muted);
   background:rgba(237,230,217,0.06);
   border:1px solid var(--line);
   border-radius:3px;
   padding:2px 7px;
-  margin-bottom:8px;
+  flex-shrink:0;
 }
 
 .layout{
@@ -340,69 +340,267 @@ section.group{ margin-top:38px; }
 .group-title.free .dot{ background:var(--moss); }
 .group-title .dot{ width:7px;height:7px;border-radius:50%; }
 
-.cards{ display:flex; flex-direction:column; gap:12px; }
+.cards{ display:flex; flex-direction:column; gap:10px; }
 
 .ticket{
   position:relative;
   background:var(--panel);
   border:1px solid var(--line);
   border-left:3px solid var(--gold-dim);
-  border-radius:4px;
-  padding:18px 46px 18px 20px;
+  border-radius:8px;
   overflow:hidden;
 }
 .ticket.free{ border-left-color:var(--moss-dim); }
 
-.ticket::after{
-  content:"";
-  position:absolute;
-  right:20px; top:0; bottom:0;
-  width:0;
-  border-right:1px dashed rgba(237,230,217,0.16);
+.ticket-row{
+  display:flex;
+  align-items:center;
+  gap:22px;
+  padding:14px 22px;
+}
+
+.ticket-identity{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  flex-shrink:0;
+}
+
+.ticket-identity-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .ticket-band{
-  font-size:19px;
+  font-family:'Bebas Neue', sans-serif;
+  font-size:29px;
+  letter-spacing:0.5px;
+  line-height:1;
+  color:var(--gold);
+  margin:0;
+  white-space:nowrap;
+}
+
+.ticket-city{
+  font-size:14.5px;
   font-weight:700;
   color:var(--paper);
-  margin:0 0 6px;
-}
-
-.ticket-meta{
-  font-size:14px;
-  color:var(--ink);
-  margin:0 0 3px;
-}
-.ticket-meta .city{ color:var(--ink); }
-.ticket-meta .venue{ color:var(--muted); }
-
-.ticket-date{
-  font-size:13px;
-  color:var(--gold);
-  font-weight:600;
-  margin:0 0 6px;
-}
-.ticket.free .ticket-date{ color:var(--moss); }
-
-.ticket-tour{
-  font-size:13px;
-  color:var(--muted);
-  font-style:italic;
   margin:0;
 }
 
-.ticket-note{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:8px;
-  padding-top:8px;
-  border-top:1px solid var(--line);
+.ticket-info{
+  flex:1;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:13.5px;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
 }
+.ticket-info .tour{
+  font-style:italic;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
+}
+.ticket-info .sep{ color:var(--gold); flex-shrink:0; }
+.ticket.free .ticket-info .sep{ color:var(--moss); }
+.ticket-info .venue{ color:var(--ink); flex-shrink:0; }
+
+.ticket-divider{
+  align-self:stretch;
+  width:0;
+  border-left:1px dashed rgba(237,230,217,0.2);
+  flex-shrink:0;
+}
+
+.ticket-stub{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.stub-day{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:36px;
+  line-height:1;
+  color:var(--paper);
+}
+.stub-monthyear{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  line-height:1.3;
+}
+.stub-month{
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:0.07em;
+  color:var(--gold);
+}
+.ticket.free .stub-month{ color:var(--moss); }
+.stub-year{
+  font-size:11px;
+  color:var(--muted);
+}
+
+.ticket-note{
+  font-size:11.5px;
+  color:var(--muted);
+  line-height:1.4;
+  padding:0 22px 14px;
+  margin-top:-4px;
+}
+
+@media (max-width: 680px){
+  .ticket-row{ flex-wrap:wrap; row-gap:8px; padding:14px 18px; }
+  .ticket-info{ order:3; width:100%; justify-content:flex-start; white-space:normal; }
+  .ticket-info .tour, .ticket-info .venue{ white-space:normal; }
+  .ticket-divider{ display:none; }
+  .ticket-stub{ margin-left:auto; }
+}
+
 
 .empty-line{
   font-size:14px;
   color:var(--muted);
   padding:14px 0;
+}
+
+/* ---------- CALENDAR (widok główny) ---------- */
+
+.calendar-card{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:28px 28px 32px;
+}
+
+.calendar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.calendar-month-label{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:30px;
+  letter-spacing:0.5px;
+  color:var(--paper);
+  text-transform:capitalize;
+}
+
+.calendar-nav{ display:flex; gap:8px; }
+
+.calendar-nav-btn{
+  width:34px; height:34px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:5px;
+  color:var(--ink);
+  font-size:17px;
+  line-height:1;
+  cursor:pointer;
+  transition: border-color .16s ease, color .16s ease;
+}
+.calendar-nav-btn:hover{ border-color:var(--gold-dim); color:var(--paper); }
+
+.calendar-weekdays{
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:6px;
+  margin-bottom:8px;
+}
+.calendar-weekdays span{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:6px;
+}
+
+.calendar-day{
+  aspect-ratio:1 / 1;
+  border:1px solid transparent;
+  border-radius:5px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-family:'Inter', sans-serif;
+  font-size:14px;
+  color:var(--ink);
+  background:transparent;
+  padding:0;
+}
+
+.calendar-day.empty{ visibility:hidden; pointer-events:none; }
+
+.calendar-day.no-event{
+  background:rgba(148,140,128,0.08);
+  color:var(--muted);
+  cursor:pointer;
+}
+.calendar-day.no-event:hover{ background:rgba(148,140,128,0.15); color:var(--ink); }
+
+.calendar-day.has-event{
+  background:rgba(201,161,59,0.13);
+  color:var(--paper);
+  font-weight:600;
+  cursor:pointer;
+}
+.calendar-day.has-event:hover{ background:rgba(201,161,59,0.24); }
+
+.calendar-day.today{ border-color:var(--gold-dim); }
+
+.calendar-day.selected{
+  background:var(--gold);
+  color:#1a1610;
+}
+.calendar-day.selected .cal-day-dot{ background:#1a1610; }
+
+.cal-day-dot{ width:4px; height:4px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+
+.calendar-panel{
+  margin-top:28px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+
+.calendar-panel-head{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:16px;
+}
+.calendar-panel-head h2{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:28px;
+  letter-spacing:0.4px;
+  margin:0;
+  color:var(--paper);
+  text-transform:capitalize;
+}
+
+.calendar-panel-empty{
+  color:var(--muted);
+  font-size:14px;
+  padding:8px 0;
 }
 
 /* ---------- EVENTS (festiwale) ---------- */
@@ -513,24 +711,39 @@ footer{
 
   <header class="hero">
     <h1 class="hero-title">KONCERTY <span>- Generacja Krzyku!</span></h1>
-    <p class="hero-sub">Wszystkie zapowiedziane koncerty, od najbliższego — podzielone na darmowe i płatne. Włącz mapę, żeby zawęzić listę do jednego województwa.</p>
+    <p class="hero-sub">Wszystkie zapowiedziane koncerty w widoku kalendarza — kliknij dzień, aby zobaczyć szczegóły. Włącz mapę, żeby zawęzić listę do jednego województwa.</p>
   </header>
 
   <div class="toolbar">
     <button id="mapToggle" class="map-toggle-btn"><span class="hex-icon"></span>Mapa</button>
     <button id="eventsToggle" class="map-toggle-btn"><span class="cal-icon"></span>Wydarzenia</button>
     <button id="bandSearchToggle" class="map-toggle-btn"><span class="search-icon"></span>Wyszukiwarka zespołów</button>
-    <p class="toolbar-hint" id="toolbarHint">Kliknij, aby wybrać województwo na mapie.</p>
+    <p class="toolbar-hint" id="toolbarHint">Kliknij dzień w kalendarzu, aby zobaczyć koncerty zaplanowane na ten termin.</p>
   </div>
 
-  <div id="listView" class="split">
-    <div class="split-col">
-      <div class="group-title free"><span class="dot"></span><h3>Darmowe</h3><span class="rule"></span></div>
-      <div class="cards" id="freeAllCards"></div>
-    </div>
-    <div class="split-col">
-      <div class="group-title paid"><span class="dot"></span><h3>Płatne</h3><span class="rule"></span></div>
-      <div class="cards" id="paidAllCards"></div>
+  <div id="listView" class="calendar-view">
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <div class="calendar-month-label" id="calMonthLabel">Wrzesień 2026</div>
+        <div class="calendar-nav">
+          <button type="button" class="calendar-nav-btn" id="calPrev" aria-label="Poprzedni miesiąc">‹</button>
+          <button type="button" class="calendar-nav-btn" id="calNext" aria-label="Następny miesiąc">›</button>
+        </div>
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <div class="calendar-panel">
+        <div class="calendar-panel-head" id="calPanelHead">
+          <h2>Wybierz dzień</h2>
+        </div>
+        <div id="calPanelBody">
+          <div class="calendar-panel-empty">Kliknij dzień w kalendarzu, aby zobaczyć zaplanowane koncerty.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -884,16 +1097,37 @@ REGIONS.forEach(info => {
 hexgrid.style.width = maxX + 'px';
 hexgrid.style.height = maxY + 'px';
 
+const TICKET_MONTHS = ['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
+
 function ticketCard(item, type, showRegion){
   const noteHtml = item.note ? `<div class="ticket-note">${item.note}</div>` : '';
   const regionHtml = showRegion ? `<span class="region-tag">${item.regionName}</span>` : '';
+  const [y, m, d] = item.sortDate.split('-').map(Number);
+
   return `
     <div class="ticket ${type}">
-      ${regionHtml}
-      <p class="ticket-band">${item.band}</p>
-      <p class="ticket-meta"><span class="city">${item.city}</span> — <span class="venue">${item.venue}</span></p>
-      <p class="ticket-date">${item.date}</p>
-      <p class="ticket-tour">${item.tour}</p>
+      <div class="ticket-row">
+        <div class="ticket-identity">
+          <div class="ticket-identity-top">
+            <p class="ticket-band">${item.band}</p>
+            ${regionHtml}
+          </div>
+          <p class="ticket-city">${item.city}</p>
+        </div>
+        <div class="ticket-info">
+          <span class="tour">${item.tour}</span>
+          <span class="sep">•</span>
+          <span class="venue">${item.venue}</span>
+        </div>
+        <div class="ticket-divider"></div>
+        <div class="ticket-stub">
+          <span class="stub-day">${d}</span>
+          <div class="stub-monthyear">
+            <span class="stub-month">${TICKET_MONTHS[m - 1]}</span>
+            <span class="stub-year">${y}</span>
+          </div>
+        </div>
+      </div>
       ${noteHtml}
     </div>`;
 }
@@ -944,35 +1178,92 @@ function selectRegion(key){
   `;
 }
 
-/* ---------- default chronological list (all regions) ---------- */
+/* ---------- calendar (widok główny) ---------- */
 
-function renderAllList(){
-  const freeAll = [];
-  const paidAll = [];
+const ITEMS_BY_DATE = {};
+ALL_ITEMS.forEach(item => {
+  (ITEMS_BY_DATE[item.sortDate] = ITEMS_BY_DATE[item.sortDate] || []).push(item);
+});
 
-  REGIONS.forEach(info => {
-    const d = DATA[info.key];
-    if(!d) return;
-    d.free.forEach(item => freeAll.push({ ...item, regionName: info.name }));
-    d.paid.forEach(item => paidAll.push({ ...item, regionName: info.name }));
-  });
+const MONTH_NAMES = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+const DAY_NAMES = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
 
-  freeAll.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
-  paidAll.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
-
-  const freeContainer = document.getElementById('freeAllCards');
-  const paidContainer = document.getElementById('paidAllCards');
-
-  freeContainer.innerHTML = freeAll.length
-    ? freeAll.map(i => ticketCard(i, 'free', true)).join('')
-    : `<div class="empty-line">Brak ogłoszonych bezpłatnych koncertów wybranych zespołów.</div>`;
-
-  paidContainer.innerHTML = paidAll.length
-    ? paidAll.map(i => ticketCard(i, 'paid', true)).join('')
-    : `<div class="empty-line">Brak ogłoszonych płatnych koncertów wybranych zespołów.</div>`;
+function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+function todayStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-renderAllList();
+let calYear = 2026;
+let calMonth = 8; // wrzesień (0-indeksowane)
+let selectedDate = null;
+
+const calMonthLabel = document.getElementById('calMonthLabel');
+const calendarGrid = document.getElementById('calendarGrid');
+const calPanelHead = document.getElementById('calPanelHead');
+const calPanelBody = document.getElementById('calPanelBody');
+
+function renderCalendar(){
+  calMonthLabel.textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+  calendarGrid.innerHTML = '';
+
+  const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+  const startOffset = (new Date(calYear, calMonth, 1).getDay() + 6) % 7; // Pn = 0
+  const nowStr = todayStr();
+
+  for(let i = 0; i < startOffset; i++){
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day empty';
+    calendarGrid.appendChild(empty);
+  }
+
+  for(let day = 1; day <= totalDays; day++){
+    const dateStr = `${calYear}-${pad2(calMonth + 1)}-${pad2(day)}`;
+    const items = ITEMS_BY_DATE[dateStr] || [];
+
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'calendar-day ' + (items.length ? 'has-event' : 'no-event');
+    if(dateStr === nowStr) cell.classList.add('today');
+    if(dateStr === selectedDate) cell.classList.add('selected');
+    cell.dataset.date = dateStr;
+    cell.innerHTML = `<span class="cal-day-num">${day}</span>` + (items.length ? '<span class="cal-day-dot"></span>' : '');
+    cell.addEventListener('click', () => selectDay(dateStr));
+    calendarGrid.appendChild(cell);
+  }
+}
+
+function selectDay(dateStr){
+  selectedDate = dateStr;
+  document.querySelectorAll('.calendar-day').forEach(c => c.classList.toggle('selected', c.dataset.date === dateStr));
+  renderDayPanel(dateStr);
+}
+
+function renderDayPanel(dateStr){
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const label = `${DAY_NAMES[dateObj.getDay()]}, ${d} ${MONTH_NAMES[m - 1].toLowerCase()} ${y}`;
+  const items = ITEMS_BY_DATE[dateStr] || [];
+
+  calPanelHead.innerHTML = `<h2>${label}</h2>` + (items.length ? `<span class="region-count">${items.length} ${items.length === 1 ? 'koncert' : 'koncertów'}</span>` : '');
+
+  calPanelBody.innerHTML = items.length
+    ? `<div class="cards">${items.map(i => ticketCard(i, i.type, true)).join('')}</div>`
+    : `<div class="calendar-panel-empty">Brak zapowiedzianych koncertów w tym dniu.</div>`;
+}
+
+document.getElementById('calPrev').addEventListener('click', () => {
+  calMonth--;
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  renderCalendar();
+});
+document.getElementById('calNext').addEventListener('click', () => {
+  calMonth++;
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+});
+
+renderCalendar();
 
 /* ---------- band search ---------- */
 
@@ -1010,7 +1301,7 @@ const searchView = document.getElementById('searchView');
 const toolbarHint = document.getElementById('toolbarHint');
 
 const HINTS = {
-  list: 'Kliknij, aby wybrać województwo na mapie.',
+  list: 'Kliknij dzień w kalendarzu, aby zobaczyć koncerty zaplanowane na ten termin.',
   map: 'Kliknij dowolny sześciokąt, aby zawęzić listę do jednego województwa.',
   events: 'Największe festiwale i cykliczne wydarzenia — daty ostatnich i nadchodzących edycji.',
   search: 'Wpisz nazwę zespołu, aby zobaczyć wszystkie jego zapowiedziane koncerty.',
@@ -1021,7 +1312,7 @@ let currentView = 'list';
 function setView(view){
   currentView = (currentView === view) ? 'list' : view;
 
-  listView.style.display = currentView === 'list' ? 'grid' : 'none';
+  listView.style.display = currentView === 'list' ? 'block' : 'none';
   mapView.style.display = currentView === 'map' ? 'grid' : 'none';
   eventsView.style.display = currentView === 'events' ? 'block' : 'none';
   searchView.style.display = currentView === 'search' ? 'block' : 'none';
